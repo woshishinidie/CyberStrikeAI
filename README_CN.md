@@ -260,21 +260,33 @@ go build -o cyberstrike-ai cmd/server/main.go
    ```
    将路径替换成你本地的实际地址，Cursor 会自动启动 stdio 版本的 MCP。
 
-#### MCP HTTP 快速集成
-1. 确认 `config.yaml` 中 `mcp.enabled: true`，按照需要调整 `mcp.host` / `mcp.port`（本地建议 `127.0.0.1:8081`）。
-2. 启动主服务（`./run.sh` 或 `go run cmd/server/main.go`），MCP 端点默认暴露在 `http://<host>:<port>/mcp`。
-3. 在 Cursor 内 `Add Custom MCP → HTTP`，将 `Base URL` 设置为 `http://127.0.0.1:8081/mcp`。
-4. 也可以在项目根目录创建 `.cursor/mcp.json` 以便团队共享：
-   ```json
-   {
-     "mcpServers": {
-       "cyberstrike-ai-http": {
-         "transport": "http",
-         "url": "http://127.0.0.1:8081/mcp"
-       }
-     }
-   }
-   ```
+#### MCP HTTP 快速集成（Cursor / Claude Code）
+HTTP MCP 服务在独立端口（默认 `8081`）运行，支持 **Header 鉴权**：仅携带正确 header 的客户端可调用工具。
+
+1. **在配置中启用 MCP** – 在 `config.yaml` 中设置 `mcp.enabled: true`，并按需设置 `mcp.host` / `mcp.port`。若需鉴权（端口对外暴露时建议开启），可设置：
+   - `mcp.auth_header`：鉴权用的 header 名（如 `X-MCP-Token`）；
+   - `mcp.auth_header_value`：鉴权密钥。**留空**时，首次启动会自动生成随机密钥并写回配置文件。
+2. **启动服务** – 执行 `./run.sh` 或 `go run cmd/server/main.go`。MCP 端点为 `http://<host>:<port>/mcp`（例如 `http://localhost:8081/mcp`）。
+3. **从终端复制 JSON** – 启用 MCP 后，启动时会在终端打印一段 **可直接复制的 JSON**。若 `auth_header_value` 留空，会自动生成并写入配置，打印内容中会包含 URL 与 headers。
+4. **在 Cursor 或 Claude Code 中使用**：
+   - **Cursor**：将整段 JSON 粘贴到 `~/.cursor/mcp.json` 或项目下的 `.cursor/mcp.json` 的 `mcpServers` 中（或合并进现有 `mcpServers`）。
+   - **Claude Code**：粘贴到 `.mcp.json` 或 `~/.claude.json` 的 `mcpServers` 中。
+
+终端打印示例（开启鉴权时）：
+```json
+{
+  "mcpServers": {
+    "cyberstrike-ai": {
+      "url": "http://localhost:8081/mcp",
+      "headers": {
+        "X-MCP-Token": "<自动生成或你配置的值>"
+      },
+      "type": "http"
+    }
+  }
+}
+```
+若不配置 `auth_header` / `auth_header_value`，则端点不鉴权（仅适合本机或可信网络）。
 
 #### 外部 MCP 联邦（HTTP/stdio/SSE）
 CyberStrikeAI 支持通过三种传输模式连接外部 MCP 服务器：
@@ -395,6 +407,8 @@ mcp:
   enabled: true
   host: "0.0.0.0"
   port: 8081
+  auth_header: "X-MCP-Token"       # 可选；留空则不鉴权
+  auth_header_value: ""            # 可选；留空则首次启动自动生成并写回
 openai:
   api_key: "sk-xxx"
   base_url: "https://api.deepseek.com/v1"
