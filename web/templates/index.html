@@ -1399,32 +1399,32 @@
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="multi-agent-enabled" class="modern-checkbox" />
                                                 <span class="checkbox-custom"></span>
-                                                <span class="checkbox-text">启用 Eino 多代理（DeepAgent）</span>
+                                                <span class="checkbox-text" data-i18n="settingsBasic.enableMultiAgent">启用 Eino 多代理（DeepAgent）</span>
                                             </label>
-                                            <small class="form-hint">开启后对话页可选「多代理」模式；子代理在 config.yaml 的 multi_agent.sub_agents 中配置。</small>
+                                            <small class="form-hint" data-i18n="settingsBasic.enableMultiAgentHint">开启后对话页可选「多代理」模式；子代理在 config.yaml 的 multi_agent.sub_agents 中配置。</small>
                                         </div>
                                         <div class="form-group">
-                                            <label for="multi-agent-default-mode">对话页默认模式</label>
+                                            <label for="multi-agent-default-mode" data-i18n="settingsBasic.multiAgentDefaultMode">对话页默认模式</label>
                                             <select id="multi-agent-default-mode">
-                                                <option value="single">单代理（ReAct）</option>
-                                                <option value="multi">多代理（Eino）</option>
+                                                <option value="single" data-i18n="settingsBasic.multiAgentModeSingle">单代理（ReAct）</option>
+                                                <option value="multi" data-i18n="settingsBasic.multiAgentModeMulti">多代理（Eino）</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="multi-agent-robot-use" class="modern-checkbox" />
                                                 <span class="checkbox-custom"></span>
-                                                <span class="checkbox-text">企业微信 / 钉钉 / 飞书机器人也使用多代理</span>
+                                                <span class="checkbox-text" data-i18n="settingsBasic.multiAgentRobotUse">企业微信 / 钉钉 / 飞书机器人也使用多代理</span>
                                             </label>
-                                            <small class="form-hint">需同时勾选「启用多代理」；调用量与成本更高。</small>
+                                            <small class="form-hint" data-i18n="settingsBasic.multiAgentRobotUseHint">需同时勾选「启用多代理」；调用量与成本更高。</small>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="multi-agent-batch-use" class="modern-checkbox" />
                                                 <span class="checkbox-custom"></span>
-                                                <span class="checkbox-text">批量任务队列也使用多代理</span>
+                                                <span class="checkbox-text" data-i18n="settingsBasic.multiAgentBatchUse">批量任务队列也使用多代理</span>
                                             </label>
-                                            <small class="form-hint">开启后，任务管理中按队列执行的每个子任务将走 Eino DeepAgent（需启用多代理）。</small>
+                                            <small class="form-hint" data-i18n="settingsBasic.multiAgentBatchUseHint">开启后，任务管理中按队列执行的每个子任务将走 Eino DeepAgent（需启用多代理）。</small>
                                         </div>
                                     </div>
                                 </div>

@@ -9264,9 +9264,8 @@ header {
     white-space: nowrap;
 }
 
-.webshell-col-owner,
-.webshell-col-group {
-    width: 110px;
+.webshell-col-owner {
+    width: 150px;
     color: var(--text-secondary);
     font-size: 0.82rem;
     white-space: nowrap;

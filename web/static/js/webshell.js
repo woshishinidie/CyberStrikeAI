@@ -127,7 +127,10 @@ function wsT(key) {
         'webshell.dbRows': '行',
         'webshell.dbColumns': '列',
         'webshell.dbSchemaFailed': '加载数据库结构失败',
+        'webshell.dbSchemaLoaded': '结构加载完成',
         'webshell.dbAddProfile': '新增连接',
+        'webshell.dbExecSuccess': 'SQL 执行成功',
+        'webshell.dbNoOutput': '执行完成（无输出）',
         'webshell.dbRenameProfile': '重命名',
         'webshell.dbDeleteProfile': '删除连接',
         'webshell.dbDeleteProfileConfirm': '确定删除该数据库连接配置吗？',
@@ -2116,11 +2119,11 @@ function selectWebshell(id, stateReady) {
                 return;
             }
             cfg.schema = parseWebshellDbSchema(parsed.output);
-            cfg.output = '结构加载完成';
+            cfg.output = wsT('webshell.dbSchemaLoaded') || '结构加载完成';
             cfg.outputIsError = false;
             saveWebshellDbConfig(conn, cfg);
             renderDbSchemaTree();
-            webshellDbSetOutput('结构加载完成', false);
+            webshellDbSetOutput(wsT('webshell.dbSchemaLoaded') || '结构加载完成', false);
         }).catch(function (err) {
             webshellDbSetOutput((wsT('webshell.dbSchemaFailed') || '加载数据库结构失败') + ': ' + (err && err.message ? err.message : String(err)), true);
         }).finally(function () {
@@ -2175,12 +2178,12 @@ function selectWebshell(id, stateReady) {
             }
             var hasTable = webshellDbRenderTable(content);
             if (hasTable) {
-                cfg.output = 'SQL 执行成功';
+                cfg.output = wsT('webshell.dbExecSuccess') || 'SQL 执行成功';
                 cfg.outputIsError = false;
                 saveWebshellDbConfig(conn, cfg);
                 webshellDbSetOutput(cfg.output, false);
             } else {
-                cfg.output = content || '执行完成（无输出）';
+                cfg.output = content || (wsT('webshell.dbNoOutput') || '执行完成（无输出）');
                 cfg.outputIsError = false;
                 saveWebshellDbConfig(conn, cfg);
                 webshellDbSetOutput(cfg.output, false);
@@ -3107,14 +3110,14 @@ function renderFileList(listEl, currentPath, rawOutput, conn, nameFilter) {
         if (rawOutput.trim() && !nameFilter) {
             html = '<pre class="webshell-file-raw">' + escapeHtml(rawOutput) + '</pre>';
         } else {
-            html = '<table class="webshell-file-table"><thead><tr><th class="webshell-col-check"><input type="checkbox" id="webshell-file-select-all" title="' + (wsT('webshell.selectAll') || '全选') + '" /></th><th>' + wsT('webshell.filePath') + '</th><th class="webshell-col-size">大小</th><th class="webshell-col-mtime">' + (wsT('webshell.colModifiedAt') || '修改时间') + '</th><th class="webshell-col-owner">' + (wsT('webshell.colOwner') || '所有者') + '</th><th class="webshell-col-group">' + (wsT('webshell.colGroup') || '用户组') + '</th><th class="webshell-col-perms">' + (wsT('webshell.colPerms') || '权限') + '</th><th class="webshell-col-actions"></th></tr></thead><tbody>' +
-                '<tr><td colspan="8" class="webshell-file-empty-state">' + (wsT('common.noData') || '暂无文件') + '</td></tr>' +
+            html = '<table class="webshell-file-table"><thead><tr><th class="webshell-col-check"><input type="checkbox" id="webshell-file-select-all" title="' + (wsT('webshell.selectAll') || '全选') + '" /></th><th>' + wsT('webshell.filePath') + '</th><th class="webshell-col-size">大小</th><th class="webshell-col-mtime">' + (wsT('webshell.colModifiedAt') || '修改时间') + '</th><th class="webshell-col-owner">' + (wsT('webshell.colOwner') || '所有者') + '</th><th class="webshell-col-perms">' + (wsT('webshell.colPerms') || '权限') + '</th><th class="webshell-col-actions"></th></tr></thead><tbody>' +
+                '<tr><td colspan="7" class="webshell-file-empty-state">' + (wsT('common.noData') || '暂无文件') + '</td></tr>' +
                 '</tbody></table>';
         }
     } else {
-        html = '<table class="webshell-file-table"><thead><tr><th class="webshell-col-check"><input type="checkbox" id="webshell-file-select-all" title="' + (wsT('webshell.selectAll') || '全选') + '" /></th><th>' + wsT('webshell.filePath') + '</th><th class="webshell-col-size">大小</th><th class="webshell-col-mtime">' + (wsT('webshell.colModifiedAt') || '修改时间') + '</th><th class="webshell-col-owner">' + (wsT('webshell.colOwner') || '所有者') + '</th><th class="webshell-col-group">' + (wsT('webshell.colGroup') || '用户组') + '</th><th class="webshell-col-perms">' + (wsT('webshell.colPerms') || '权限') + '</th><th class="webshell-col-actions"></th></tr></thead><tbody>';
+        html = '<table class="webshell-file-table"><thead><tr><th class="webshell-col-check"><input type="checkbox" id="webshell-file-select-all" title="' + (wsT('webshell.selectAll') || '全选') + '" /></th><th>' + wsT('webshell.filePath') + '</th><th class="webshell-col-size">大小</th><th class="webshell-col-mtime">' + (wsT('webshell.colModifiedAt') || '修改时间') + '</th><th class="webshell-col-owner">' + (wsT('webshell.colOwner') || '所有者') + '</th><th class="webshell-col-perms">' + (wsT('webshell.colPerms') || '权限') + '</th><th class="webshell-col-actions"></th></tr></thead><tbody>';
         if (currentPath !== '.' && currentPath !== '') {
-            html += '<tr><td></td><td><a href="#" class="webshell-file-link" data-path="' + escapeHtml(currentPath.replace(/\/[^/]+$/, '') || '.') + '" data-isdir="1">..</a></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            html += '<tr><td></td><td><a href="#" class="webshell-file-link" data-path="' + escapeHtml(currentPath.replace(/\/[^/]+$/, '') || '.') + '" data-isdir="1">..</a></td><td></td><td></td><td></td><td></td><td></td></tr>';
         }
         items.forEach(function (item) {
             var pathNext = currentPath === '.' ? item.name : currentPath + '/' + item.name;
@@ -3125,7 +3128,6 @@ function renderFileList(listEl, currentPath, rawOutput, conn, nameFilter) {
             html += '<td class="webshell-col-size">' + escapeHtml(item.size) + '</td>';
             html += '<td class="webshell-col-mtime">' + escapeHtml(item.mtime || '') + '</td>';
             html += '<td class="webshell-col-owner">' + escapeHtml(item.owner || '') + '</td>';
-            html += '<td class="webshell-col-group">' + escapeHtml(item.group || '') + '</td>';
             html += '<td class="webshell-col-perms">' + escapeHtml(item.mode || '') + '</td>';
             html += '<td class="webshell-col-actions">';
             if (item.isDir) {
@@ -3705,9 +3707,13 @@ function refreshWebshellUIOnLanguageChange() {
             setWebshellTerminalStatus(webshellTerminalRunning);
             if (webshellCurrentConn) renderWebshellTerminalSessions(webshellCurrentConn);
             var pathLabel = workspace.querySelector('.webshell-file-toolbar label span');
+            var fileSidebarTitle = workspace.querySelector('.webshell-file-sidebar-title');
+            var fileMoreActionsBtn = workspace.querySelector('.webshell-toolbar-actions-btn');
             var listDirBtn = document.getElementById('webshell-list-dir');
             var parentDirBtn = document.getElementById('webshell-parent-dir');
             if (pathLabel) pathLabel.textContent = wsT('webshell.filePath');
+            if (fileSidebarTitle) fileSidebarTitle.textContent = wsT('webshell.dirTree') || '目录列表';
+            if (fileMoreActionsBtn) fileMoreActionsBtn.textContent = wsT('webshell.moreActions') || '更多操作';
             if (listDirBtn) listDirBtn.textContent = wsT('webshell.listDir');
             if (parentDirBtn) parentDirBtn.textContent = wsT('webshell.parentDir');
             // 文件管理工具栏按钮（红框区域）：切换语言时立即更新
