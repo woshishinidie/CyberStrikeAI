@@ -278,8 +278,10 @@ let toolsStatusFilter = '';
 
 // 加载工具列表（分页）
 async function loadToolsList(page = 1, searchKeyword = '') {
+    // 等待 i18n 就绪，避免快速刷新时翻译函数未初始化导致显示占位符
+    if (window.i18nReady) await window.i18nReady;
     const toolsList = document.getElementById('tools-list');
-    
+
     // 显示加载状态
     if (toolsList) {
         // 清空整个容器，包括可能存在的分页控件
@@ -1241,6 +1243,8 @@ async function fetchExternalMCPs() {
 // 加载外部MCP列表并渲染
 async function loadExternalMCPs() {
     try {
+        // 等待 i18n 就绪，避免快速刷新时翻译函数未初始化导致显示占位符
+        if (window.i18nReady) await window.i18nReady;
         const data = await fetchExternalMCPs();
         renderExternalMCPList(data.servers || {});
         renderExternalMCPStats(data.stats || {});

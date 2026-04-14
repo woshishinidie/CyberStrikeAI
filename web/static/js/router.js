@@ -232,7 +232,9 @@ function showSubmenuPopup(navItem, menuId) {
 }
 
 // 初始化页面
-function initPage(pageId) {
+async function initPage(pageId) {
+    // 等待 i18n 就绪，避免快速刷新时翻译函数未初始化导致页面显示原始占位符 key
+    if (window.i18nReady) await window.i18nReady;
     switch(pageId) {
         case 'dashboard':
             if (typeof refreshDashboard === 'function') {
