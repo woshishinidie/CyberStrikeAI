@@ -1338,6 +1338,9 @@
                                 <div class="settings-nav-item active" data-section="basic" onclick="switchSettingsSection('basic')">
                                     <span data-i18n="settings.nav.basic">基本设置</span>
                                 </div>
+                                <div class="settings-nav-item" data-section="infocollect" onclick="switchSettingsSection('infocollect')">
+                                    <span data-i18n="settings.nav.infocollect">信息收集</span>
+                                </div>
                                 <div class="settings-nav-item" data-section="knowledge" onclick="switchSettingsSection('knowledge')">
                                     <span data-i18n="settings.nav.knowledge">知识库</span>
                                 </div>
@@ -1384,30 +1387,14 @@
                                             <label for="openai-model"><span data-i18n="settingsBasic.model">模型</span> <span style="color: red;">*</span></label>
                                             <input type="text" id="openai-model" data-i18n="settingsBasic.modelPlaceholder" data-i18n-attr="placeholder" placeholder="gpt-4" required />
                                         </div>
+                                        <div class="form-group">
+                                            <label for="openai-max-total-tokens"><span data-i18n="settingsBasic.maxTotalTokens">最大上下文 Token 数</span></label>
+                                            <input type="number" id="openai-max-total-tokens" data-i18n="settingsBasic.maxTotalTokensPlaceholder" data-i18n-attr="placeholder" placeholder="120000" min="1000" step="1000" />
+                                            <small style="color: var(--text-muted, #718096); font-size: 0.75rem;" data-i18n="settingsBasic.maxTotalTokensHint">内存压缩和攻击链构建共用此配置，默认 120000</small>
+                                        </div>
                                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
                                             <a href="javascript:void(0)" id="test-openai-btn" onclick="testOpenAIConnection()" style="font-size: 0.8125rem; color: var(--accent-color, #3182ce); text-decoration: none; cursor: pointer; user-select: none;" data-i18n="settingsBasic.testConnection">测试连接</a>
                                             <span id="test-openai-result" style="font-size: 0.8125rem;"></span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- FOFA配置 -->
-                                <div class="settings-subsection">
-                                    <h4 data-i18n="settingsBasic.fofaConfig">FOFA 配置</h4>
-                                    <div class="settings-form">
-                                        <div class="form-group">
-                                            <label for="fofa-base-url">Base URL</label>
-                                            <input type="text" id="fofa-base-url" data-i18n="settingsBasic.fofaBaseUrlPlaceholder" data-i18n-attr="placeholder" placeholder="https://fofa.info/api/v1/search/all（可选）" />
-                                            <small class="form-hint" data-i18n="settingsBasic.fofaBaseUrlHint">留空则使用默认地址。</small>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="fofa-email" data-i18n="settingsBasic.email">Email</label>
-                                            <input type="text" id="fofa-email" data-i18n="settingsBasic.fofaEmailPlaceholder" data-i18n-attr="placeholder" placeholder="输入 FOFA 账号邮箱" autocomplete="off" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="fofa-api-key">API Key</label>
-                                            <input type="password" id="fofa-api-key" data-i18n="settingsBasic.fofaApiKeyPlaceholder" data-i18n-attr="placeholder" placeholder="输入 FOFA API Key" autocomplete="off" />
-                                            <small class="form-hint" data-i18n="settingsBasic.fofaApiKeyHint">仅保存在服务器配置中（`config.yaml`）。</small>
                                         </div>
                                     </div>
                                 </div>
@@ -1448,6 +1435,34 @@
 
                                 <div class="settings-actions">
                                     <button class="btn-primary" onclick="applySettings()" data-i18n="settings.apply.button">应用配置</button>
+                                </div>
+                            </div>
+
+                            <!-- 信息收集设置 -->
+                            <div id="settings-section-infocollect" class="settings-section-content">
+                                <div class="settings-section-header">
+                                    <h3 data-i18n="settings.infocollect.title">信息收集</h3>
+                                </div>
+
+                                <!-- FOFA配置 -->
+                                <div class="settings-subsection">
+                                    <h4 data-i18n="settingsBasic.fofaConfig">FOFA 配置</h4>
+                                    <div class="settings-form">
+                                        <div class="form-group">
+                                            <label for="fofa-base-url">Base URL</label>
+                                            <input type="text" id="fofa-base-url" data-i18n="settingsBasic.fofaBaseUrlPlaceholder" data-i18n-attr="placeholder" placeholder="https://fofa.info/api/v1/search/all（可选）" />
+                                            <small class="form-hint" data-i18n="settingsBasic.fofaBaseUrlHint">留空则使用默认地址。</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fofa-email" data-i18n="settingsBasic.email">Email</label>
+                                            <input type="text" id="fofa-email" data-i18n="settingsBasic.fofaEmailPlaceholder" data-i18n-attr="placeholder" placeholder="输入 FOFA 账号邮箱" autocomplete="off" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fofa-api-key">API Key</label>
+                                            <input type="password" id="fofa-api-key" data-i18n="settingsBasic.fofaApiKeyPlaceholder" data-i18n-attr="placeholder" placeholder="输入 FOFA API Key" autocomplete="off" />
+                                            <small class="form-hint" data-i18n="settingsBasic.fofaApiKeyHint">仅保存在服务器配置中（`config.yaml`）。</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

@@ -595,7 +595,11 @@
       "knowledge": "知识库",
       "robots": "机器人设置",
       "terminal": "终端",
-      "security": "安全设置"
+      "security": "安全设置",
+      "infocollect": "信息收集"
+    },
+    "infocollect": {
+      "title": "信息收集"
     },
     "knowledge": {
       "title": "知识库设置"
@@ -1256,6 +1260,9 @@
     "openaiBaseUrlPlaceholder": "https://api.openai.com/v1",
     "openaiApiKeyPlaceholder": "输入OpenAI API Key",
     "modelPlaceholder": "gpt-4",
+    "maxTotalTokens": "最大上下文 Token 数",
+    "maxTotalTokensPlaceholder": "120000",
+    "maxTotalTokensHint": "内存压缩和攻击链构建共用此配置，默认 120000",
     "fofaBaseUrlPlaceholder": "https://fofa.info/api/v1/search/all（可选）",
     "fofaBaseUrlHint": "留空则使用默认地址。",
     "email": "Email",

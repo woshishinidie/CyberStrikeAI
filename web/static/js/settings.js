@@ -109,6 +109,10 @@ async function loadConfig(loadTools = true) {
         document.getElementById('openai-api-key').value = currentConfig.openai.api_key || '';
         document.getElementById('openai-base-url').value = currentConfig.openai.base_url || '';
         document.getElementById('openai-model').value = currentConfig.openai.model || '';
+        const maxTokensEl = document.getElementById('openai-max-total-tokens');
+        if (maxTokensEl) {
+            maxTokensEl.value = currentConfig.openai.max_total_tokens || 120000;
+        }
 
         // 填充FOFA配置
         const fofa = currentConfig.fofa || {};
@@ -829,7 +833,8 @@ async function applySettings() {
                 provider: provider,
                 api_key: apiKey,
                 base_url: baseUrl,
-                model: model
+                model: model,
+                max_total_tokens: parseInt(document.getElementById('openai-max-total-tokens')?.value) || 120000
             },
             fofa: {
                 email: document.getElementById('fofa-email')?.value.trim() || '',
