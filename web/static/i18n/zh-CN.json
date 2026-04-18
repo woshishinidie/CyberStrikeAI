@@ -1594,7 +1594,7 @@
     "agentMode": "代理模式",
     "agentModeSingle": "单代理（ReAct）",
     "agentModeMulti": "多代理（Eino）",
-    "agentModeHint": "与对话页一致：单代理 ReAct 或 Deep / Plan-Execute / Supervisor（Eino 需已启用多代理）。",
+    "agentModeHint": "与对话页一致：原生 ReAct、Eino 单代理（ADK），或 Deep / Plan-Execute / Supervisor（后三种需已启用多代理）。",
     "scheduleMode": "调度方式",
     "scheduleModeManual": "手工执行",
     "scheduleModeCron": "调度表达式（Cron）",

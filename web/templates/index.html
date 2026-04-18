@@ -2436,12 +2436,13 @@
                 <div class="form-group">
                     <label for="batch-queue-agent-mode" data-i18n="batchImportModal.agentMode">代理模式</label>
                     <select id="batch-queue-agent-mode" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem;">
-                        <option value="single" data-i18n="batchImportModal.agentModeSingle">单代理（ReAct）</option>
+                        <option value="single" data-i18n="chat.agentModeReactNative">原生 ReAct 模式</option>
+                        <option value="eino_single" data-i18n="chat.agentModeEinoSingle">Eino 单代理（ADK）</option>
                         <option value="deep" data-i18n="chat.agentModeDeep">Deep（DeepAgent）</option>
                         <option value="plan_execute" data-i18n="chat.agentModePlanExecuteLabel">Plan-Execute</option>
                         <option value="supervisor" data-i18n="chat.agentModeSupervisorLabel">Supervisor</option>
                     </select>
-                    <div class="form-hint" style="margin-top: 4px;" data-i18n="batchImportModal.agentModeHint">与对话页一致：原生 ReAct 或三种 Eino 编排（需已启用多代理）。</div>
+                    <div class="form-hint" style="margin-top: 4px;" data-i18n="batchImportModal.agentModeHint">与对话页一致：原生 ReAct、Eino 单代理（ADK），或 Deep / Plan-Execute / Supervisor（后三种需已启用多代理）。</div>
                 </div>
                 <div class="form-group">
                     <label for="batch-queue-schedule-mode" data-i18n="batchImportModal.scheduleMode">调度方式</label>

@@ -1594,7 +1594,7 @@
     "agentMode": "Agent mode",
     "agentModeSingle": "Single-agent (ReAct)",
     "agentModeMulti": "Multi-agent (Eino)",
-    "agentModeHint": "Same as chat: single-agent ReAct or Deep / Plan-Execute / Supervisor (Eino requires multi-agent enabled).",
+    "agentModeHint": "Same as chat: native ReAct, Eino single-agent (ADK), or Deep / Plan-Execute / Supervisor (the last three require multi-agent enabled).",
     "scheduleMode": "Schedule mode",
     "scheduleModeManual": "Manual",
     "scheduleModeCron": "Cron expression",
