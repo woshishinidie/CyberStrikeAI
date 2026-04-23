@@ -22,6 +22,7 @@ type Config struct {
 	OpenAI      OpenAIConfig          `yaml:"openai"`
 	FOFA        FofaConfig            `yaml:"fofa,omitempty" json:"fofa,omitempty"`
 	Agent       AgentConfig           `yaml:"agent"`
+	Hitl        HitlConfig            `yaml:"hitl,omitempty" json:"hitl,omitempty"`
 	Security    SecurityConfig        `yaml:"security"`
 	Database    DatabaseConfig        `yaml:"database"`
 	Auth        AuthConfig            `yaml:"auth"`
@@ -39,21 +40,21 @@ type Config struct {
 type MultiAgentConfig struct {
 	Enabled            bool `yaml:"enabled" json:"enabled"`
 	RobotUseMultiAgent bool `yaml:"robot_use_multi_agent" json:"robot_use_multi_agent"` // 为 true 时钉钉/飞书/企微机器人走 Eino 多代理
-	BatchUseMultiAgent bool   `yaml:"batch_use_multi_agent" json:"batch_use_multi_agent"` // 为 true 时批量任务队列中每子任务走 Eino 多代理
+	BatchUseMultiAgent bool `yaml:"batch_use_multi_agent" json:"batch_use_multi_agent"` // 为 true 时批量任务队列中每子任务走 Eino 多代理
 	// Orchestration 已弃用：保留仅兼容旧版 config.yaml；编排由聊天/WebShell 请求体 orchestration 决定，未传时按 deep。
 	Orchestration string `yaml:"orchestration,omitempty" json:"orchestration,omitempty"`
 	MaxIteration  int    `yaml:"max_iteration" json:"max_iteration"` // 主代理 / 执行器最大推理轮次（Deep、Supervisor、plan_execute 的 Executor）
 	// PlanExecuteLoopMaxIterations plan_execute 模式下 execute↔replan 外层循环上限；0 表示用 Eino 默认 10。
-	PlanExecuteLoopMaxIterations int                   `yaml:"plan_execute_loop_max_iterations,omitempty" json:"plan_execute_loop_max_iterations,omitempty"`
-	SubAgentMaxIterations        int                   `yaml:"sub_agent_max_iterations" json:"sub_agent_max_iterations"`
-	WithoutGeneralSubAgent       bool                  `yaml:"without_general_sub_agent" json:"without_general_sub_agent"`
-	WithoutWriteTodos            bool                  `yaml:"without_write_todos" json:"without_write_todos"`
-	OrchestratorInstruction      string                `yaml:"orchestrator_instruction" json:"orchestrator_instruction"`
+	PlanExecuteLoopMaxIterations int    `yaml:"plan_execute_loop_max_iterations,omitempty" json:"plan_execute_loop_max_iterations,omitempty"`
+	SubAgentMaxIterations        int    `yaml:"sub_agent_max_iterations" json:"sub_agent_max_iterations"`
+	WithoutGeneralSubAgent       bool   `yaml:"without_general_sub_agent" json:"without_general_sub_agent"`
+	WithoutWriteTodos            bool   `yaml:"without_write_todos" json:"without_write_todos"`
+	OrchestratorInstruction      string `yaml:"orchestrator_instruction" json:"orchestrator_instruction"`
 	// OrchestratorInstructionPlanExecute plan_execute 主代理（规划侧）系统提示；非空且 agents/orchestrator-plan-execute.md 正文为空或未存在时生效。不与 Deep 的 orchestrator_instruction 混用。
 	OrchestratorInstructionPlanExecute string `yaml:"orchestrator_instruction_plan_execute,omitempty" json:"orchestrator_instruction_plan_execute,omitempty"`
 	// OrchestratorInstructionSupervisor supervisor 主代理系统提示（transfer/exit 说明仍由运行追加）；非空且 agents/orchestrator-supervisor.md 正文为空或未存在时生效。
-	OrchestratorInstructionSupervisor string `yaml:"orchestrator_instruction_supervisor,omitempty" json:"orchestrator_instruction_supervisor,omitempty"`
-	SubAgents                    []MultiAgentSubConfig `yaml:"sub_agents" json:"sub_agents"`
+	OrchestratorInstructionSupervisor string                `yaml:"orchestrator_instruction_supervisor,omitempty" json:"orchestrator_instruction_supervisor,omitempty"`
+	SubAgents                         []MultiAgentSubConfig `yaml:"sub_agents" json:"sub_agents"`
 	// SubAgentUserContextMaxRunes caps the user-context supplement appended to task descriptions for sub-agents.
 	// 0 (default) uses the built-in default of 2000 runes; negative value disables injection entirely.
 	SubAgentUserContextMaxRunes int `yaml:"sub_agent_user_context_max_runes,omitempty" json:"sub_agent_user_context_max_runes,omitempty"`
@@ -76,10 +77,10 @@ type MultiAgentEinoMiddlewareConfig struct {
 	// PlantaskRelDir relative to skills_dir for per-conversation task boards (default .eino/plantask).
 	PlantaskRelDir string `yaml:"plantask_rel_dir,omitempty" json:"plantask_rel_dir,omitempty"`
 	// Reduction truncates/offloads large tool outputs (requires eino local backend for Write).
-	ReductionEnable           bool     `yaml:"reduction_enable,omitempty" json:"reduction_enable,omitempty"`
-	ReductionRootDir          string   `yaml:"reduction_root_dir,omitempty" json:"reduction_root_dir,omitempty"` // default: os temp + conversation id
-	ReductionClearExclude     []string `yaml:"reduction_clear_exclude,omitempty" json:"reduction_clear_exclude,omitempty"`
-	ReductionSubAgents        bool     `yaml:"reduction_sub_agents,omitempty" json:"reduction_sub_agents,omitempty"` // also attach to sub-agents
+	ReductionEnable       bool     `yaml:"reduction_enable,omitempty" json:"reduction_enable,omitempty"`
+	ReductionRootDir      string   `yaml:"reduction_root_dir,omitempty" json:"reduction_root_dir,omitempty"` // default: os temp + conversation id
+	ReductionClearExclude []string `yaml:"reduction_clear_exclude,omitempty" json:"reduction_clear_exclude,omitempty"`
+	ReductionSubAgents    bool     `yaml:"reduction_sub_agents,omitempty" json:"reduction_sub_agents,omitempty"` // also attach to sub-agents
 	// CheckpointDir when non-empty enables adk.Runner CheckPointStore (file-backed) for interrupt/resume persistence.
 	CheckpointDir string `yaml:"checkpoint_dir,omitempty" json:"checkpoint_dir,omitempty"`
 	// DeepOutputKey passed to deep.Config OutputKey (session final text); empty = off.
@@ -130,8 +131,8 @@ type MultiAgentSubConfig struct {
 
 // MultiAgentPublic 返回给前端的精简信息（不含子代理指令全文）。
 type MultiAgentPublic struct {
-	Enabled                      bool `json:"enabled"`
-	RobotUseMultiAgent           bool `json:"robot_use_multi_agent"`
+	Enabled                      bool   `json:"enabled"`
+	RobotUseMultiAgent           bool   `json:"robot_use_multi_agent"`
 	BatchUseMultiAgent           bool   `json:"batch_use_multi_agent"`
 	SubAgentCount                int    `json:"sub_agent_count"`
 	Orchestration                string `json:"orchestration,omitempty"`
@@ -155,8 +156,8 @@ func NormalizeMultiAgentOrchestration(s string) string {
 type MultiAgentAPIUpdate struct {
 	Enabled                      bool `json:"enabled"`
 	RobotUseMultiAgent           bool `json:"robot_use_multi_agent"`
-	BatchUseMultiAgent           bool   `json:"batch_use_multi_agent"`
-	PlanExecuteLoopMaxIterations *int   `json:"plan_execute_loop_max_iterations,omitempty"`
+	BatchUseMultiAgent           bool `json:"batch_use_multi_agent"`
+	PlanExecuteLoopMaxIterations *int `json:"plan_execute_loop_max_iterations,omitempty"`
 }
 
 // RobotsConfig 机器人配置（企业微信、钉钉、飞书等）
@@ -242,6 +243,13 @@ type AgentConfig struct {
 	ToolTimeoutMinutes   int    `yaml:"tool_timeout_minutes" json:"tool_timeout_minutes"`     // 单次工具执行最大时长（分钟），超时自动终止，防止长时间挂起；0 表示不限制（不推荐）
 	// SystemPromptPath 单代理系统提示 Markdown/文本文件路径（相对 config.yaml 所在目录，或可写绝对路径）。非空且可读时替换内置单代理提示；留空用内置。
 	SystemPromptPath string `yaml:"system_prompt_path,omitempty" json:"system_prompt_path,omitempty"`
+}
+
+// HitlConfig 人机协同全局选项；与会话侧栏/API 中的白名单合并为并集后参与判定。
+// tool_whitelist 可在侧栏「应用」时合并写入 config.yaml 并立即生效；其他字段若仅改文件仍需重启。
+type HitlConfig struct {
+	// ToolWhitelist 全局免审批工具名（与每条会话配置的 sensitiveTools 语义相同：白名单内工具不触发 HITL）。
+	ToolWhitelist []string `yaml:"tool_whitelist,omitempty" json:"tool_whitelist,omitempty"`
 }
 
 type AuthConfig struct {
@@ -950,10 +958,10 @@ type RolesConfig struct {
 
 // RoleConfig 单个角色配置
 type RoleConfig struct {
-	Name        string   `yaml:"name" json:"name"`                         // 角色名称
-	Description string   `yaml:"description" json:"description"`           // 角色描述
-	UserPrompt  string   `yaml:"user_prompt" json:"user_prompt"`           // 用户提示词(追加到用户消息前)
-	Icon        string   `yaml:"icon,omitempty" json:"icon,omitempty"`     // 角色图标（可选）
+	Name        string   `yaml:"name" json:"name"`                       // 角色名称
+	Description string   `yaml:"description" json:"description"`         // 角色描述
+	UserPrompt  string   `yaml:"user_prompt" json:"user_prompt"`         // 用户提示词(追加到用户消息前)
+	Icon        string   `yaml:"icon,omitempty" json:"icon,omitempty"`   // 角色图标（可选）
 	Tools       []string `yaml:"tools,omitempty" json:"tools,omitempty"` // 关联的工具列表（toolKey格式，如 "toolName" 或 "mcpName::toolName"）
 	MCPs        []string `yaml:"mcps,omitempty" json:"mcps,omitempty"`   // 向后兼容：关联的MCP服务器列表（已废弃，使用tools替代）
 	Enabled     bool     `yaml:"enabled" json:"enabled"`                 // 是否启用

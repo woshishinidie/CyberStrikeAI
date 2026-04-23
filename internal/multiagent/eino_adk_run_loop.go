@@ -230,6 +230,17 @@ attemptLoop:
 				continue
 			}
 			if ev.Err != nil {
+				if errors.Is(ev.Err, context.DeadlineExceeded) {
+					flushAllPendingAsFailed(ev.Err)
+					if progress != nil {
+						progress("error", ev.Err.Error(), map[string]interface{}{
+							"conversationId": conversationID,
+							"source":         "eino",
+							"errorKind":      "timeout",
+						})
+					}
+					return nil, ev.Err
+				}
 				// context.Canceled 是唯一应当直接终止编排的错误（用户关闭页面、主动停止等）。
 				if errors.Is(ev.Err, context.Canceled) {
 					flushAllPendingAsFailed(ev.Err)
