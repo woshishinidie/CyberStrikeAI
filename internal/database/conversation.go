@@ -308,7 +308,7 @@ func (db *DB) GetConversationLite(id string) (*Conversation, error) {
 func (db *DB) ListConversations(limit, offset int, search string) ([]*Conversation, error) {
 	var rows *sql.Rows
 	var err error
-	
+
 	if search != "" {
 		// 使用 EXISTS 子查询代替 LEFT JOIN + DISTINCT，避免大表笛卡尔积
 		searchPattern := "%" + search + "%"
@@ -327,7 +327,7 @@ func (db *DB) ListConversations(limit, offset int, search string) ([]*Conversati
 			limit, offset,
 		)
 	}
-	
+
 	if err != nil {
 		return nil, fmt.Errorf("查询对话列表失败: %w", err)
 	}
@@ -421,20 +421,21 @@ func (db *DB) DeleteConversation(id string) error {
 	return nil
 }
 
-// SaveReActData 保存最后一轮ReAct的输入和输出
-func (db *DB) SaveReActData(conversationID, reactInput, reactOutput string) error {
+// SaveAgentTrace 保存最后一轮代理消息轨迹与助手输出摘要。
+// SQLite 列名仍为 last_react_input / last_react_output，与历史库表兼容；语义上为「全模式代理轨迹」，非仅 ReAct。
+func (db *DB) SaveAgentTrace(conversationID, traceInputJSON, assistantOutput string) error {
 	_, err := db.Exec(
 		"UPDATE conversations SET last_react_input = ?, last_react_output = ?, updated_at = ? WHERE id = ?",
-		reactInput, reactOutput, time.Now(), conversationID,
+		traceInputJSON, assistantOutput, time.Now(), conversationID,
 	)
 	if err != nil {
-		return fmt.Errorf("保存ReAct数据失败: %w", err)
+		return fmt.Errorf("保存代理轨迹失败: %w", err)
 	}
 	return nil
 }
 
-// GetReActData 获取最后一轮ReAct的输入和输出
-func (db *DB) GetReActData(conversationID string) (reactInput, reactOutput string, err error) {
+// GetAgentTrace 读取 conversations 中保存的代理轨迹（列名 last_react_*）。
+func (db *DB) GetAgentTrace(conversationID string) (traceInputJSON, assistantOutput string, err error) {
 	var input, output sql.NullString
 	err = db.QueryRow(
 		"SELECT last_react_input, last_react_output FROM conversations WHERE id = ?",
@@ -444,17 +445,17 @@ func (db *DB) GetReActData(conversationID string) (reactInput, reactOutput strin
 		if err == sql.ErrNoRows {
 			return "", "", fmt.Errorf("对话不存在")
 		}
-		return "", "", fmt.Errorf("获取ReAct数据失败: %w", err)
+		return "", "", fmt.Errorf("获取代理轨迹失败: %w", err)
 	}
 
 	if input.Valid {
-		reactInput = input.String
+		traceInputJSON = input.String
 	}
 	if output.Valid {
-		reactOutput = output.String
+		assistantOutput = output.String
 	}
 
-	return reactInput, reactOutput, nil
+	return traceInputJSON, assistantOutput, nil
 }
 
 // ConversationHasToolProcessDetails 对话是否存在已落库的工具调用/结果（用于多代理等场景下 MCP execution id 未汇总时的攻击链判定）。

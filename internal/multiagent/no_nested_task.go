@@ -59,4 +59,3 @@ func (m *noNestedTaskMiddleware) WrapInvokableToolCall(
 		return endpoint(ctx2, argumentsInJSON, opts...)
 	}, nil
 }
-

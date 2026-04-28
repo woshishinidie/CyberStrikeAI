@@ -49,12 +49,12 @@ func ParseSkillMD(raw []byte) (*SkillManifest, string, error) {
 }
 
 type skillFrontMatterExport struct {
-	Name            string         `yaml:"name"`
-	Description     string         `yaml:"description"`
-	License         string         `yaml:"license,omitempty"`
-	Compatibility   string         `yaml:"compatibility,omitempty"`
-	Metadata        map[string]any `yaml:"metadata,omitempty"`
-	AllowedTools    string         `yaml:"allowed-tools,omitempty"`
+	Name          string         `yaml:"name"`
+	Description   string         `yaml:"description"`
+	License       string         `yaml:"license,omitempty"`
+	Compatibility string         `yaml:"compatibility,omitempty"`
+	Metadata      map[string]any `yaml:"metadata,omitempty"`
+	AllowedTools  string         `yaml:"allowed-tools,omitempty"`
 }
 
 // BuildSkillMD serializes SKILL.md per agentskills.io.

@@ -52,7 +52,7 @@ func NewDB(dbPath string, logger *zap.Logger) (*DB, error) {
 
 // initTables 初始化数据库表
 func (db *DB) initTables() error {
-	// 创建对话表
+	// 创建对话表（last_react_input / last_react_output 存「代理消息轨迹」JSON 与助手摘要，列名保留以兼容已有库）
 	createConversationsTable := `
 	CREATE TABLE IF NOT EXISTS conversations (
 		id TEXT PRIMARY KEY,

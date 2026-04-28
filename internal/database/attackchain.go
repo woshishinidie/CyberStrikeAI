@@ -165,4 +165,3 @@ func (db *DB) DeleteAttackChain(conversationID string) error {
 
 	return nil
 }
-

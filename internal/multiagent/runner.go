@@ -30,10 +30,10 @@ import (
 
 // RunResult 与单 Agent 循环结果字段对齐，便于复用存储与 SSE 收尾逻辑。
 type RunResult struct {
-	Response        string
-	MCPExecutionIDs []string
-	LastReActInput  string
-	LastReActOutput string
+	Response             string
+	MCPExecutionIDs      []string
+	LastAgentTraceInput  string // 已序列化的消息带（JSON）：原生循环或 Eino 均写入，供续跑/攻击链等恢复上下文
+	LastAgentTraceOutput string // 本轮助手侧对外展示文本（摘要或最终回复）
 }
 
 // toolCallPendingInfo tracks a tool_call emitted to the UI so we can later

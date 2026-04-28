@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	maxPackageFiles   = 4000
-	maxPackageDepth   = 24
-	maxScriptsDepth   = 24
-	defaultMaxRead    = 10 << 20
+	maxPackageFiles = 4000
+	maxPackageDepth = 24
+	maxScriptsDepth = 24
+	defaultMaxRead  = 10 << 20
 )
 
 // SafeRelPath resolves rel inside root (no ..).

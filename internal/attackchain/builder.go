@@ -145,7 +145,7 @@ func (b *Builder) BuildChainFromConversation(ctx context.Context, conversationID
 	}
 
 	// 1. 优先尝试从数据库获取保存的最后一轮ReAct输入和输出
-	reactInputJSON, modelOutput, err := b.db.GetReActData(conversationID)
+	reactInputJSON, modelOutput, err := b.db.GetAgentTrace(conversationID)
 	if err != nil {
 		b.logger.Warn("获取保存的ReAct数据失败，将使用消息历史构建", zap.Error(err))
 		// 继续使用原来的逻辑
@@ -170,7 +170,7 @@ func (b *Builder) BuildChainFromConversation(ctx context.Context, conversationID
 			messageCount = len(tempMessages)
 		}
 
-		dataSource = "database_last_react_input"
+		dataSource = "database_last_agent_trace"
 		b.logger.Info("使用保存的ReAct数据构建攻击链",
 			zap.String("conversationId", conversationID),
 			zap.String("dataSource", dataSource),
@@ -183,7 +183,7 @@ func (b *Builder) BuildChainFromConversation(ctx context.Context, conversationID
 		// userInput = b.extractUserInputFromReActInput(reactInputJSON)
 
 		// 将JSON格式的messages转换为可读格式
-		reactInputFinal = b.formatReActInputFromJSON(reactInputJSON)
+		reactInputFinal = b.formatAgentTraceInputFromJSON(reactInputJSON)
 	} else {
 		// 2. 如果没有保存的ReAct数据，从对话消息构建
 		dataSource = "messages_table"
@@ -201,7 +201,7 @@ func (b *Builder) BuildChainFromConversation(ctx context.Context, conversationID
 		}
 
 		// 提取最后一轮ReAct的输入（历史消息+当前用户输入）
-		reactInputFinal = b.buildReActInput(messages)
+		reactInputFinal = b.buildAgentTraceInput(messages)
 
 		// 提取大模型最后的输出（最后一条assistant消息）
 		for i := len(messages) - 1; i >= 0; i-- {
@@ -212,7 +212,7 @@ func (b *Builder) BuildChainFromConversation(ctx context.Context, conversationID
 		}
 	}
 
-	// 多代理：保存的 last_react_input 可能仅为首轮用户消息，不含工具轨迹；补充最后一轮助手的过程详情（与单代理「最后一轮 ReAct」对齐）
+	// 多代理：保存的轨迹列可能仅为首轮用户消息，不含工具轨迹；补充最后一轮助手的过程详情（与单代理完整轨迹对齐）
 	hasMCPOnAssistant := false
 	var lastAssistantID string
 	for i := len(messages) - 1; i >= 0; i-- {
@@ -366,8 +366,8 @@ func (b *Builder) formatProcessDetailsForAttackChain(details []database.ProcessD
 	return strings.TrimSpace(sb.String())
 }
 
-// buildReActInput 构建最后一轮ReAct的输入（历史消息+当前用户输入）
-func (b *Builder) buildReActInput(messages []database.Message) string {
+// buildAgentTraceInput 构建最后一轮ReAct的输入（历史消息+当前用户输入）
+func (b *Builder) buildAgentTraceInput(messages []database.Message) string {
 	var builder strings.Builder
 	for _, msg := range messages {
 		builder.WriteString(fmt.Sprintf("[%s]: %s\n\n", msg.Role, msg.Content))
@@ -396,8 +396,8 @@ func (b *Builder) buildReActInput(messages []database.Message) string {
 // 	return ""
 // }
 
-// formatReActInputFromJSON 将JSON格式的messages数组转换为可读的字符串格式
-func (b *Builder) formatReActInputFromJSON(reactInputJSON string) string {
+// formatAgentTraceInputFromJSON 将JSON格式的messages数组转换为可读的字符串格式
+func (b *Builder) formatAgentTraceInputFromJSON(reactInputJSON string) string {
 	var messages []map[string]interface{}
 	if err := json.Unmarshal([]byte(reactInputJSON), &messages); err != nil {
 		b.logger.Warn("解析ReAct输入JSON失败", zap.Error(err))

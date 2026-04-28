@@ -62,7 +62,7 @@ func TestExternalMCPManager_RemoveConfig(t *testing.T) {
 	manager := NewExternalMCPManager(logger)
 
 	cfg := config.ExternalMCPServerConfig{
-		Command:   "python3",
+		Command:           "python3",
 		ExternalMCPEnable: false,
 	}
 
@@ -86,17 +86,17 @@ func TestExternalMCPManager_GetStats(t *testing.T) {
 
 	// 添加多个配置
 	manager.AddOrUpdateConfig("enabled1", config.ExternalMCPServerConfig{
-		Command: "python3",
+		Command:           "python3",
 		ExternalMCPEnable: true,
 	})
 
 	manager.AddOrUpdateConfig("enabled2", config.ExternalMCPServerConfig{
-		URL:     "http://127.0.0.1:8081/mcp",
+		URL:               "http://127.0.0.1:8081/mcp",
 		ExternalMCPEnable: true,
 	})
 
 	manager.AddOrUpdateConfig("disabled1", config.ExternalMCPServerConfig{
-		Command:  "python3",
+		Command:           "python3",
 		ExternalMCPEnable: false,
 	})
 
@@ -122,11 +122,11 @@ func TestExternalMCPManager_LoadConfigs(t *testing.T) {
 	externalMCPConfig := config.ExternalMCPConfig{
 		Servers: map[string]config.ExternalMCPServerConfig{
 			"loaded1": {
-				Command: "python3",
+				Command:           "python3",
 				ExternalMCPEnable: true,
 			},
 			"loaded2": {
-				URL:     "http://127.0.0.1:8081/mcp",
+				URL:               "http://127.0.0.1:8081/mcp",
 				ExternalMCPEnable: false,
 			},
 		},
@@ -153,9 +153,9 @@ func TestLazySDKClient_InitializeFails(t *testing.T) {
 	logger := zap.NewNop()
 	// 使用不存在的 HTTP 地址，Initialize 应失败
 	cfg := config.ExternalMCPServerConfig{
-		Type: "http",
-		URL:       "http://127.0.0.1:19999/nonexistent",
-		Timeout:   2,
+		Type:    "http",
+		URL:     "http://127.0.0.1:19999/nonexistent",
+		Timeout: 2,
 	}
 	c := newLazySDKClient(cfg, logger)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -176,7 +176,7 @@ func TestExternalMCPManager_StartStopClient(t *testing.T) {
 
 	// 添加一个禁用的配置
 	cfg := config.ExternalMCPServerConfig{
-		Command:   "python3",
+		Command:           "python3",
 		ExternalMCPEnable: false,
 	}
 

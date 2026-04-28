@@ -13,7 +13,7 @@ import (
 
 const (
 	planExecuteMaxStepResultRunes = 12000
-	planExecuteKeepLastSteps    = 16
+	planExecuteKeepLastSteps      = 16
 )
 
 func truncateRunesWithSuffix(s string, maxRunes int, suffix string) string {

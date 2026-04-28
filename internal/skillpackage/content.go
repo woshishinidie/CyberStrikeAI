@@ -162,4 +162,3 @@ func truncateRunes(s string, max int) string {
 	}
 	return string(r[:max]) + "…"
 }
-
