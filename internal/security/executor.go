@@ -699,9 +699,9 @@ func (e *Executor) formatParamValue(param config.ParameterConfig, value interfac
 	}
 }
 
-// isBackgroundCommand 检测命令是否为完全后台命令（末尾有 & 符号，但不在引号内）
-// 注意：command1 & command2 这种情况不算完全后台，因为command2会在前台执行
-func (e *Executor) isBackgroundCommand(command string) bool {
+// IsBackgroundShellCommand 检测命令是否为完全后台命令（末尾有独立 &，且不在引号内）。
+// command1 & command2 不算完全后台（command2 仍在前台执行）。
+func IsBackgroundShellCommand(command string) bool {
 	// 移除首尾空格
 	command = strings.TrimSpace(command)
 	if command == "" {
@@ -827,7 +827,7 @@ func (e *Executor) executeSystemCommand(ctx context.Context, args map[string]int
 	}
 
 	// 检测是否为后台命令（包含 & 符号，但不在引号内）
-	isBackground := e.isBackgroundCommand(command)
+	isBackground := IsBackgroundShellCommand(command)
 
 	// 构建命令
 	var cmd *exec.Cmd
@@ -852,9 +852,10 @@ func (e *Executor) executeSystemCommand(ctx context.Context, args map[string]int
 		commandWithoutAmpersand := strings.TrimSuffix(strings.TrimSpace(command), "&")
 		commandWithoutAmpersand = strings.TrimSpace(commandWithoutAmpersand)
 
-		// 构建新命令：command & pid=$!; echo $pid
-		// 使用变量保存PID，确保能获取到正确的后台进程PID
-		pidCommand := fmt.Sprintf("%s & pid=$!; echo $pid", commandWithoutAmpersand)
+		// 构建新命令：将用户命令置于独立重定向的后台作业，再 echo $pid。
+		// 若子进程与 echo 共享同一 stdout 管道，且长时间不向 stdout 写入换行，
+		// bufio.ReadString('\n') 会永久阻塞（例如 beacon 持续写二进制/单行日志）。
+		pidCommand := fmt.Sprintf("%s </dev/null >/dev/null 2>&1 & pid=$!; echo $pid", commandWithoutAmpersand)
 
 		// 创建新命令来获取PID
 		var pidCmd *exec.Cmd
