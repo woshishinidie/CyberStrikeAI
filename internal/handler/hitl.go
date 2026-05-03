@@ -233,6 +233,15 @@ func (m *HITLManager) shouldInterrupt(conversationID, toolName string) (hitlRunt
 	return cfg, !inWhitelist
 }
 
+// NeedsToolApproval 与 Agent 工具层 shouldInterrupt 语义一致：仅当该会话已开启人机协同且工具不在免审批白名单时为 true。
+func (m *HITLManager) NeedsToolApproval(conversationID, toolName string) bool {
+	if m == nil {
+		return false
+	}
+	_, need := m.shouldInterrupt(conversationID, toolName)
+	return need
+}
+
 func (m *HITLManager) CreatePendingInterrupt(conversationID, assistantMessageID, mode, toolName, toolCallID, payload string) (*pendingInterrupt, error) {
 	now := time.Now()
 	id := "hitl_" + strings.ReplaceAll(uuid.New().String(), "-", "")

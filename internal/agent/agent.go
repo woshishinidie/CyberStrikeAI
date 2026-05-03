@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"cyberstrike-ai/internal/c2"
 	"cyberstrike-ai/internal/config"
 	"cyberstrike-ai/internal/mcp"
 	"cyberstrike-ai/internal/mcp/builtin"
@@ -72,6 +73,11 @@ func agentConversationIDFromContext(ctx context.Context) string {
 	}
 	v, _ := ctx.Value(agentConversationIDKey{}).(string)
 	return v
+}
+
+// ConversationIDFromContext 返回当前 Agent 请求上下文中注入的对话 ID（如 C2 MCP 入队与人机协同门控使用）。
+func ConversationIDFromContext(ctx context.Context) string {
+	return agentConversationIDFromContext(ctx)
 }
 
 // ToolCallInterceptor allows caller to gate or rewrite tool arguments just before execution.
@@ -1485,6 +1491,8 @@ func (a *Agent) executeToolViaMCP(ctx context.Context, toolName string, args map
 			}
 		}()
 	}
+	// C2 危险任务 HITL 异步等待：须绑定整条 Agent 运行期 ctx，而非单次工具子 ctx（return 时会被 cancel）
+	toolCtx = c2.WithHITLRunContext(toolCtx, ctx)
 
 	// 检查是否是外部MCP工具（通过工具名称映射）
 	a.mu.RLock()

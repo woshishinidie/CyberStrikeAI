@@ -184,6 +184,14 @@ func (h *AgentHandler) SetHitlToolWhitelistSaver(s HitlToolWhitelistSaver) {
 	h.hitlWhitelistSaver = s
 }
 
+// HITLNeedsToolApproval 供 C2 危险任务门控：与会话侧人机协同及免审批白名单判定一致。
+func (h *AgentHandler) HITLNeedsToolApproval(conversationID, toolName string) bool {
+	if h == nil || h.hitlManager == nil {
+		return false
+	}
+	return h.hitlManager.NeedsToolApproval(conversationID, toolName)
+}
+
 // ChatAttachment 聊天附件（用户上传的文件）
 type ChatAttachment struct {
 	FileName   string `json:"fileName"`          // 展示用文件名

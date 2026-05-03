@@ -81,6 +81,6 @@ func subAgentFilesystemMiddleware(ctx context.Context, loc *localbk.Local) (adk.
 	}
 	return filesystem.New(ctx, &filesystem.MiddlewareConfig{
 		Backend:        loc,
-		StreamingShell: loc,
+		StreamingShell: &einoStreamingShellWrap{inner: loc},
 	})
 }

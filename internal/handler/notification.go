@@ -38,6 +38,7 @@ type NotificationSummaryItem struct {
 	VulnerabilityID string `json:"vulnerabilityId,omitempty"`
 	ExecutionID     string `json:"executionId,omitempty"`
 	InterruptID     string `json:"interruptId,omitempty"`
+	SessionID       string `json:"sessionId,omitempty"` // C2 会话（如新会话上线）
 }
 
 // NotificationSummaryResponse 聚合响应
@@ -237,6 +238,52 @@ func (h *NotificationHandler) loadVulnerabilityItems(sinceMs int64, limit int, e
 		})
 	}
 	return items, counts, nil
+}
+
+// loadC2SessionOnlineEvents 新会话上线（c2_events：session + critical，与 Manager.IngestCheckIn 一致）
+func (h *NotificationHandler) loadC2SessionOnlineEvents(sinceMs int64, limit int, english bool) ([]NotificationSummaryItem, int, error) {
+	sinceSec := normalizedSinceSec(sinceMs)
+	rows, err := h.db.Query(`
+		SELECT id, message, COALESCE(session_id, ''),
+			COALESCE(CAST(strftime('%s', created_at) AS INTEGER), 0)
+		FROM c2_events
+		WHERE category = 'session' AND level = 'critical'
+		  AND CAST(strftime('%s', created_at) AS INTEGER) > ?
+		ORDER BY created_at DESC
+		LIMIT ?
+	`, sinceSec, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+	items := make([]NotificationSummaryItem, 0, limit)
+	for rows.Next() {
+		var id, message, sessionID string
+		var createdSec int64
+		if err := rows.Scan(&id, &message, &sessionID, &createdSec); err != nil {
+			continue
+		}
+		desc := strings.TrimSpace(message)
+		if len(desc) > 220 {
+			desc = desc[:200] + "…"
+		}
+		if desc == "" {
+			desc = i18nText(english, "新会话已建立", "A new session was created")
+		}
+		items = append(items, NotificationSummaryItem{
+			ID:         "c2evt:" + id,
+			Level:      "p0",
+			Type:       "c2_session_online",
+			Title:      i18nText(english, "C2 新会话上线", "C2 new session online"),
+			Desc:       desc,
+			Ts:         unixSecToRFC3339(createdSec),
+			Count:      1,
+			Actionable: false,
+			Read:       false,
+			SessionID:  sessionID,
+		})
+	}
+	return items, len(items), rows.Err()
 }
 
 func (h *NotificationHandler) loadFailedExecutionItems(sinceMs int64, limit int, english bool) ([]NotificationSummaryItem, int, error) {
@@ -492,6 +539,7 @@ func normalizeMarkableEventID(id string) (string, bool) {
 		"vuln:",
 		"exec_failed:",
 		"task_completed:",
+		"c2evt:",
 	}
 	for _, prefix := range allowedPrefixes {
 		if strings.HasPrefix(v, prefix) {
@@ -593,12 +641,20 @@ func (h *NotificationHandler) GetSummary(c *gin.Context) {
 		return
 	}
 
+	c2OnlineItems, c2OnlineCount, err := h.loadC2SessionOnlineEvents(sinceMs, limit, english)
+	if err != nil {
+		h.logger.Warn("加载 C2 会话上线通知失败", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to summarize c2 session events"})
+		return
+	}
+
 	longRunningItems, longRunningCount := h.summarizeLongRunningTasks(15*time.Minute, english)
 	completedItems, completedCount := h.summarizeCompletedTasksSince(sinceMs, limit, english)
 
-	items := make([]NotificationSummaryItem, 0, len(hitlItems)+len(vulnItems)+len(longRunningItems)+len(completedItems))
+	items := make([]NotificationSummaryItem, 0, len(hitlItems)+len(vulnItems)+len(c2OnlineItems)+len(longRunningItems)+len(completedItems))
 	items = append(items, hitlItems...)
 	items = append(items, vulnItems...)
+	items = append(items, c2OnlineItems...)
 	items = append(items, longRunningItems...)
 	items = append(items, completedItems...)
 
@@ -636,6 +692,7 @@ func (h *NotificationHandler) GetSummary(c *gin.Context) {
 			"failedExecutions": 0,
 			"longRunningTasks": longRunningCount,
 			"completedTasks":   completedCount,
+			"c2SessionOnline":  c2OnlineCount,
 		},
 		Items: items,
 	})
