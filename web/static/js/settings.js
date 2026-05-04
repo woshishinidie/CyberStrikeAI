@@ -29,6 +29,42 @@ let toolsPagination = {
     totalPages: 0
 };
 
+let c2NavSyncedOnce = false;
+
+/** 首次进入仪表盘等页面前拉一次配置，隐藏侧栏 C2（避免禁用后仍显示） */
+window.syncC2NavOnceFromServer = async function syncC2NavOnceFromServer() {
+    if (c2NavSyncedOnce || typeof apiFetch === 'undefined') {
+        return;
+    }
+    c2NavSyncedOnce = true;
+    try {
+        const r = await apiFetch('/api/config');
+        if (r.ok) {
+            const cfg = await r.json();
+            syncC2NavFromConfig(cfg);
+        }
+    } catch (_) {
+        /* ignore */
+    }
+};
+
+// 根据 C2 是否启用显示主导航 C2 入口与仪表盘 C2 区块（与 /api/config 的 c2.enabled 一致）
+function syncC2NavFromConfig(cfg) {
+    const on = cfg && cfg.c2 && cfg.c2.enabled !== false;
+    const nav = document.getElementById('nav-c2');
+    if (nav) {
+        nav.style.display = on ? '' : 'none';
+    }
+    const dash = document.getElementById('dashboard-section-c2');
+    if (dash) {
+        if (!on) {
+            dash.hidden = true;
+        } else {
+            dash.removeAttribute('hidden');
+        }
+    }
+}
+
 // 切换设置分类
 function switchSettingsSection(section) {
     // 更新导航项状态
@@ -273,6 +309,12 @@ async function loadConfig(loadTools = true) {
                 retryDelayInput.value = indexing.retry_delay_ms ?? 1000;
             }
         }
+
+        const c2EnabledCb = document.getElementById('c2-enabled');
+        if (c2EnabledCb) {
+            c2EnabledCb.checked = currentConfig.c2?.enabled !== false;
+        }
+        syncC2NavFromConfig(currentConfig);
 
         // 填充机器人配置
         const robots = currentConfig.robots || {};
@@ -975,6 +1017,9 @@ async function applySettings() {
         const knowledgeEnabled = knowledgeEnabledCheckbox ? knowledgeEnabledCheckbox.checked : true;
         
         // 收集知识库配置
+        const c2EnabledCheckbox = document.getElementById('c2-enabled');
+        const c2Enabled = c2EnabledCheckbox ? c2EnabledCheckbox.checked : true;
+
         const knowledgeConfig = {
             enabled: knowledgeEnabled,
             base_path: document.getElementById('knowledge-base-path')?.value.trim() || 'knowledge_base',
@@ -1048,6 +1093,9 @@ async function applySettings() {
                 };
             })(),
             knowledge: knowledgeConfig,
+            c2: {
+                enabled: c2Enabled
+            },
             robots: {
                 wecom: {
                     enabled: document.getElementById('robot-wecom-enabled')?.checked === true,
@@ -1174,6 +1222,15 @@ async function applySettings() {
             ? window.t('settings.apply.applySuccess')
             : '配置已成功应用！';
         alert(successMsg);
+        try {
+            const cfgResp = await apiFetch('/api/config');
+            if (cfgResp.ok) {
+                const fresh = await cfgResp.json();
+                syncC2NavFromConfig(fresh);
+            }
+        } catch (e) {
+            console.warn('refresh C2 nav after apply', e);
+        }
         try {
             if (typeof initChatAgentModeFromConfig === 'function') {
                 await initChatAgentModeFromConfig();

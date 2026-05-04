@@ -789,6 +789,7 @@
     "nav": {
       "basic": "Basic",
       "knowledge": "Knowledge base",
+      "c2": "C2",
       "robots": "Bots",
       "terminal": "Terminal",
       "security": "Security",
@@ -799,6 +800,12 @@
     },
     "knowledge": {
       "title": "Knowledge base"
+    },
+    "c2": {
+      "title": "C2",
+      "sectionTitle": "Built-in C2",
+      "enableLabel": "Enable built-in C2 (listeners, sessions, payloads, MCP tools)",
+      "enableHint": "When off, listeners are not started and C2 MCP tools are not registered; the C2 sidebar is hidden—useful for local-only chat/knowledge deployments. Click Apply to save."
     },
     "robots": {
       "title": "Bot settings",

@@ -1937,6 +1937,9 @@
                                 <div class="settings-nav-item" data-section="knowledge" onclick="switchSettingsSection('knowledge')">
                                     <span data-i18n="settings.nav.knowledge">知识库</span>
                                 </div>
+                                <div class="settings-nav-item" data-section="c2" onclick="switchSettingsSection('c2')">
+                                    <span data-i18n="settings.nav.c2">C2</span>
+                                </div>
                                 <div class="settings-nav-item" data-section="robots" onclick="switchSettingsSection('robots')">
                                     <span data-i18n="settings.nav.robots">机器人设置</span>
                                 </div>
@@ -2217,6 +2220,29 @@
                                     </div>
                                 </div>
 
+                                <div class="settings-actions">
+                                    <button class="btn-primary" onclick="applySettings()" data-i18n="settings.apply.button">应用配置</button>
+                                </div>
+                            </div>
+
+                            <!-- C2 总开关 -->
+                            <div id="settings-section-c2" class="settings-section-content">
+                                <div class="settings-section-header">
+                                    <h3 data-i18n="settings.c2.title">C2 设置</h3>
+                                </div>
+                                <div class="settings-subsection">
+                                    <h4 data-i18n="settings.c2.sectionTitle">内置 C2</h4>
+                                    <div class="settings-form">
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="c2-enabled" class="modern-checkbox" />
+                                                <span class="checkbox-custom"></span>
+                                                <span class="checkbox-text" data-i18n="settings.c2.enableLabel">启用内置 C2（监听器、会话、Payload、MCP 工具等）</span>
+                                            </label>
+                                            <small class="form-hint" data-i18n="settings.c2.enableHint">关闭后不再启动监听器、不注册 C2 相关 MCP 工具，侧栏 C2 入口将隐藏；仅本机使用对话与知识库时可关闭以节省资源。</small>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="settings-actions">
                                     <button class="btn-primary" onclick="applySettings()" data-i18n="settings.apply.button">应用配置</button>
                                 </div>

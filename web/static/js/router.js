@@ -65,6 +65,9 @@ function initRouter() {
 
 // 切换页面
 function switchPage(pageId) {
+    if (typeof window.syncC2NavOnceFromServer === 'function') {
+        void window.syncC2NavOnceFromServer();
+    }
     // 隐藏所有页面
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');

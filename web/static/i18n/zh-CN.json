@@ -778,6 +778,7 @@
     "nav": {
       "basic": "基本设置",
       "knowledge": "知识库",
+      "c2": "C2",
       "robots": "机器人设置",
       "terminal": "终端",
       "security": "安全设置",
@@ -788,6 +789,12 @@
     },
     "knowledge": {
       "title": "知识库设置"
+    },
+    "c2": {
+      "title": "C2 设置",
+      "sectionTitle": "内置 C2",
+      "enableLabel": "启用内置 C2（监听器、会话、Payload、MCP 工具等）",
+      "enableHint": "关闭后不再启动监听器、不注册 C2 相关 MCP 工具，侧栏 C2 入口将隐藏；仅本机使用对话与知识库时可关闭以节省资源。修改后请点击「应用配置」。"
     },
     "robots": {
       "title": "机器人设置",
