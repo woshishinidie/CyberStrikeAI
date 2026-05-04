@@ -28,6 +28,7 @@ type Config struct {
 	Auth        AuthConfig            `yaml:"auth"`
 	ExternalMCP ExternalMCPConfig     `yaml:"external_mcp,omitempty"`
 	Knowledge   KnowledgeConfig       `yaml:"knowledge,omitempty"`
+	C2          C2Config              `yaml:"c2,omitempty" json:"c2,omitempty"` // 内置 C2 总开关；未配置时默认启用
 	Robots      RobotsConfig          `yaml:"robots,omitempty" json:"robots,omitempty"`         // 企业微信/钉钉/飞书等机器人配置
 	RolesDir    string                `yaml:"roles_dir,omitempty" json:"roles_dir,omitempty"`   // 角色配置文件目录（新方式）
 	Roles       map[string]RoleConfig `yaml:"roles,omitempty" json:"roles,omitempty"`           // 向后兼容：支持在主配置文件中定义角色
@@ -995,6 +996,35 @@ func Default() *Config {
 			},
 		},
 	}
+}
+
+// C2Config 内置 C2 模块开关（与知识库 enabled 语义一致：关闭后不初始化监听器、不注册 C2 MCP 工具）。
+type C2Config struct {
+	// Enabled 为 nil 表示未写配置，按 true 处理（兼容旧 config.yaml）
+	Enabled *bool `yaml:"enabled,omitempty" json:"enabled,omitempty"`
+}
+
+// EnabledEffective 返回是否启用 C2；未显式配置时默认启用。
+func (c C2Config) EnabledEffective() bool {
+	if c.Enabled == nil {
+		return true
+	}
+	return *c.Enabled
+}
+
+// C2Public 返回给前端的 C2 状态（仅标量）。
+type C2Public struct {
+	Enabled bool `json:"enabled"`
+}
+
+// Public 将内部配置转为 API 响应。
+func (c C2Config) Public() C2Public {
+	return C2Public{Enabled: c.EnabledEffective()}
+}
+
+// C2APIUpdate 设置页/API 更新 C2 开关。
+type C2APIUpdate struct {
+	Enabled bool `json:"enabled"`
 }
 
 // KnowledgeConfig 知识库配置
